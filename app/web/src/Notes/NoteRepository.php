@@ -21,6 +21,24 @@ class NoteRepository
         return $statement->fetchAll();
     }
 
+    public function getById(int $id): array|null
+    {
+        $statement = $this->pdo->prepare(
+            "SELECT id, title, content, priority, is_pinned, created_at, updated_at
+             FROM notes
+             WHERE id = :id
+             LIMIT 1"
+        );
+
+        $statement->execute([
+            ':id' => $id,
+        ]);
+
+        $note = $statement->fetch();
+
+        return $note ?: null;
+    }
+
     public function create(
         string $title,
         string $content,

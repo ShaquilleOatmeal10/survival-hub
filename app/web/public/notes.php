@@ -39,10 +39,12 @@ require_once __DIR__ . '/../templates/nav.php';
     <ul>
         <?php foreach ($notes as $note): ?>
             <li>
-                <strong><?php echo htmlspecialchars($note['title']); ?></strong>
+                <strong>
+                    <a href="view-note.php?id=<?php echo (int) $note['id']; ?>">
+                        <?php echo htmlspecialchars($note['title']); ?>
+                    </a>
+                </strong>
                 (<?php echo htmlspecialchars($note['priority']); ?>)
-                <br>
-                <?php echo nl2br(htmlspecialchars($note['content'])); ?>
 
                 <?php if (!empty($note['tags'])): ?>
                     <br>
