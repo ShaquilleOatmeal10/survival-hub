@@ -95,4 +95,8 @@ require_once __DIR__ . '/../templates/nav.php';
     <a href="notes.php">Back to Notes</a>
 </p>
 
+<p>
+    <a href="edit-note.php?id=<?php echo (int) $note['id']; ?>">Edit Note</a>
+</p>
+
 <?php require_once __DIR__ . '/../templates/footer.php'; ?>

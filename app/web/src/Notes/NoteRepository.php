@@ -79,4 +79,24 @@ class NoteRepository
 
         return $noteId;
     }
+
+    public function update(int $id, string $title, string $content, string $priority): void
+    {
+        $statement = $this->pdo->prepare(
+            "UPDATE notes
+             SET title = :title,
+                 content = :content,
+                 priority = :priority,
+                 updated_at = :updated_at
+             WHERE id = :id"
+        );
+
+        $statement->execute([
+            ':title' => $title,
+            ':content' => $content,
+            ':priority' => $priority,
+            ':updated_at' => date('Y-m-d H:i:s'),
+            ':id' => $id,
+        ]);
+    }
 }
