@@ -21,8 +21,13 @@ class NoteRepository
         return $statement->fetchAll();
     }
 
-    public function create(string $title, string $content, string $priority = 'reference', int $isPinned = 0): void
-    {
+    public function create(
+        string $title,
+        string $content,
+        string $priority = 'reference',
+        int $isPinned = 0,
+        array $tagIds = []
+    ): int {
         $now = date('Y-m-d H:i:s');
 
         $statement = $this->pdo->prepare(
@@ -38,5 +43,22 @@ class NoteRepository
             ':created_at' => $now,
             ':updated_at' => $now,
         ]);
+
+        $noteId = (int) $this->pdo->lastInsertId();
+
+        foreach ($tagIds as $tagId) {
+            $tagStatement = $this->pdo->prepare(
+                "INSERT INTO item_tags (item_type, item_id, tag_id)
+                 VALUES (:item_type, :item_id, :tag_id)"
+            );
+
+            $tagStatement->execute([
+                ':item_type' => 'note',
+                ':item_id' => $noteId,
+                ':tag_id' => (int) $tagId,
+            ]);
+        }
+
+        return $noteId;
     }
 }

@@ -35,4 +35,23 @@ class TagRepository
             ':created_at' => date('Y-m-d H:i:s'),
         ]);
     }
+
+    public function getByItem(string $itemType, int $itemId): array
+    {
+        $statement = $this->pdo->prepare(
+            "SELECT tags.id, tags.name
+             FROM tags
+             INNER JOIN item_tags ON tags.id = item_tags.tag_id
+             WHERE item_tags.item_type = :item_type
+               AND item_tags.item_id = :item_id
+             ORDER BY tags.name ASC"
+        );
+
+        $statement->execute([
+            ':item_type' => $itemType,
+            ':item_id' => $itemId,
+        ]);
+
+        return $statement->fetchAll();
+    }
 }
