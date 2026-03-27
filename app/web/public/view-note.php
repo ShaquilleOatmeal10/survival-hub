@@ -3,10 +3,12 @@
 require_once __DIR__ . '/../src/Database/Database.php';
 require_once __DIR__ . '/../src/Notes/NoteRepository.php';
 require_once __DIR__ . '/../src/Tags/TagRepository.php';
+require_once __DIR__ . '/../src/Links/LinkRepository.php';
 
 use App\Database\Database;
 use App\Notes\NoteRepository;
 use App\Tags\TagRepository;
+use App\Links\LinkRepository;
 
 $config = require __DIR__ . '/../../../config/app/app.php';
 
@@ -22,6 +24,7 @@ try {
 
     $noteRepository = new NoteRepository($pdo);
     $tagRepository = new TagRepository($pdo);
+    $linkRepository = new LinkRepository($pdo);
 
     $note = $noteRepository->getById($id);
 
@@ -30,6 +33,7 @@ try {
     }
 
     $tags = $tagRepository->getByItem('note', $id);
+    $linkedNotes = $linkRepository->getOutgoingLinks('note', $id, 'note');
 } catch (Throwable $e) {
     die('<h1>Error</h1><pre>' . htmlspecialchars($e->getMessage()) . '</pre>');
 }
@@ -71,6 +75,21 @@ require_once __DIR__ . '/../templates/nav.php';
 <div>
     <?php echo nl2br(htmlspecialchars($note['content'])); ?>
 </div>
+
+<?php if (!empty($linkedNotes)): ?>
+    <hr>
+    <h2>Linked Notes</h2>
+    <ul>
+        <?php foreach ($linkedNotes as $linkedNote): ?>
+            <li>
+                <a href="view-note.php?id=<?php echo (int) $linkedNote['note_id']; ?>">
+                    <?php echo htmlspecialchars($linkedNote['title']); ?>
+                </a>
+                (<?php echo htmlspecialchars($linkedNote['link_type']); ?>)
+            </li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
 
 <p>
     <a href="notes.php">Back to Notes</a>
