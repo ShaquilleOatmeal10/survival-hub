@@ -99,4 +99,50 @@ class NoteRepository
             ':id' => $id,
         ]);
     }
+
+public function delete(int $id): void
+{
+    $this->pdo->beginTransaction();
+
+    try {
+        $deleteTags = $this->pdo->prepare(
+            "DELETE FROM item_tags
+             WHERE item_type = :item_type
+               AND item_id = :item_id"
+        );
+
+        $deleteTags->execute([
+            ':item_type' => 'note',
+            ':item_id' => $id,
+        ]);
+
+        $deleteLinks = $this->pdo->prepare(
+            "DELETE FROM links
+             WHERE (from_type = :from_type AND from_id = :from_id)
+                OR (to_type = :to_type AND to_id = :to_id)"
+        );
+
+        $deleteLinks->execute([
+            ':from_type' => 'note',
+            ':from_id' => $id,
+            ':to_type' => 'note',
+            ':to_id' => $id,
+        ]);
+
+        $deleteNote = $this->pdo->prepare(
+            "DELETE FROM notes
+             WHERE id = :id"
+        );
+
+        $deleteNote->execute([
+            ':id' => $id,
+        ]);
+
+        $this->pdo->commit();
+    } catch (\Throwable $e) {
+        $this->pdo->rollBack();
+        throw $e;
+    }
+}
+
 }
